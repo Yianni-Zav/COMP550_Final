@@ -9,7 +9,6 @@ openai.api_key = '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'
 RUBRIC = ("Please provide evaluations in a CSV-like format. For Irony, Exaggeration, Wordplay, and Deprecation, give a binary score (0 or 1). For Overall Humor, score from 1 to 3, where 1 is not funny, 2 is slightly funny, and 3 is funny.")
 
 
-
 def evaluate_jokes(jokes):
     prompt = RUBRIC + "\n\n" + "\n\n".join([f"Joke {id}: {joke}\nEvaluate in CSV format (Irony,Exaggeration,Wordplay,Deprecation,Overall Humor):" for id, joke in jokes])
 
@@ -24,7 +23,7 @@ def evaluate_jokes(jokes):
             return parse_gpt_response(response, jokes)
         except openai.error.RateLimitError as e:
             if attempt < retry_attempts - 1:
-                wait_time = 3  # Wait for 3 seconds before retrying
+                wait_time = 10  # Wait for 10 seconds before retrying
                 print(f"Rate limit reached, retrying in {wait_time} seconds...")
                 time.sleep(wait_time)
             else:
@@ -87,7 +86,7 @@ if __name__ == "__main__":
     # Update the CSV file with evaluations
     with open('jokes_evaluated.csv', mode='w', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
-        writer.writerow(['id', 'joke', 'irony', 'exaggeration', 'wordplay', 'deprecation', 'overall humor'])
+        writer.writerow(['irony', 'exaggeration', 'wordplay', 'deprecation', 'overall humor'])
         for (id, joke), evaluation in zip(jokes, all_evaluations):
             writer.writerow([id, joke] + list(evaluation))
 
